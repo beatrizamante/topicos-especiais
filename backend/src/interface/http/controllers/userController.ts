@@ -231,6 +231,6 @@ export class UserController {
     }
 
     users.splice(index, 1);
-    res.json({ message: "User deleted!" });
+    res.status(204).json({ message: "User deleted!" });
   }
 }
