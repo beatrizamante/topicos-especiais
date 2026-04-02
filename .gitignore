@@ -1,6 +1,11 @@
 # compiled output
 /backend/dist
+/frontend/dist
+/frontend/build
+/backend/build
 /node_modules
+/backend/node_modules
+/frontend/node_modules
 /build
 
 # Logs
@@ -55,4 +60,5 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+/backend/generated
 /generated/prisma
