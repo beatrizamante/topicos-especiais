@@ -1,11 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-  IsInt,
-  Min,
-  Max,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
 
 export class UpdateFictionDto {
   @IsString()
@@ -27,6 +20,6 @@ export class UpdateFictionDto {
   publishedAt?: number;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   link?: string;
 }

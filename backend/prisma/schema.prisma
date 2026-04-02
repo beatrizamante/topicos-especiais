@@ -26,6 +26,7 @@ model Fiction {
   description  String?
   genre        String?
   publishedAt  Int?
+  link         String?
   authorId     Int
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
@@ -59,7 +60,7 @@ model Review {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   fiction        Fiction          @relation(fields: [fictionId], references: [id], onDelete: Cascade)
-  author         User            @relation(fields: [authorId], references: [id])
+  author         User             @relation(fields: [authorId], references: [id])
 
   @@unique([fictionId, authorId])
   @@map("reviews")
