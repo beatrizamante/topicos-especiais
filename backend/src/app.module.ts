@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './auth/auth.module.js';
-import { UsersModule } from './users/users.module.js';
-import { FictionsModule } from './fictions/fictions.module.js';
 import { AuthorsModule } from './authors/authors.module.js';
+import { FictionsModule } from './fictions/fictions.module.js';
+import { PrismaModule } from './prisma/prisma.module.js';
 import { ReviewsModule } from './reviews/reviews.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [

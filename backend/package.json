@@ -14,11 +14,13 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "vitest",
-    "test:watch": "vitest --watch",
-    "test:cov": "vitest --coverage",
+    "test": "vitest --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts --watch",
+    "test:cov": "vitest --config vitest.config.ts --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "vitest --config ./test/vitest-e2e.json",
+    "test:db": "vitest --config ./test/integration/db/vitest-db.config.ts",
+    "test:e2e": "vitest --config ./test/e2e/vitest-e2e.config.ts",
+    "test:all": "vitest --config vitest.config.ts && vitest --config ./test/integration/db/vitest-db.config.ts && vitest --config ./test/e2e/vitest-e2e.config.ts",
     "seed": "tsx prisma/seed.ts"
   },
   "prisma": {

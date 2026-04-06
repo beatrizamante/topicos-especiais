@@ -1,18 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Delete,
   Body,
+  Controller,
+  Delete,
+  Get,
   Param,
   ParseIntPipe,
+  Post,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/current-user.decorator.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import * as jwtPayloadInterface from '../auth/jwt-payload.interface.js';
-import { CreateAuthorDto } from './dto/create-author.dto.js';
 import { AuthorsService } from './authors.service.js';
+import { CreateAuthorDto } from './dto/create-author.dto.js';
 
 @Controller('fictions/:fictionId/authors')
 export class AuthorsController {

@@ -12,5 +12,18 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: if-reads-db-test
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: beatriz
+      POSTGRES_PASSWORD: beatriz123
+      POSTGRES_DB: if-reads-test
+    tmpfs:
+      - /var/lib/postgresql/data
+
 volumes:
   pgdata:
