@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/style/useImportType: NestJS needs these files to be imported as packages for Dependency Injection*/
 import {
   Body,
   Controller,

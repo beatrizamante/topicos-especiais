@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../../src/generated/prisma/index.js';
 
 export async function cleanDb(prisma: PrismaClient) {
   await prisma.$executeRawUnsafe(
