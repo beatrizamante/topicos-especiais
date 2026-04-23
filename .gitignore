@@ -46,6 +46,7 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+.agents
 
 # temp directory
 .temp
@@ -62,3 +63,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /backend/generated
 /generated/prisma
+
+#Neon
+skills-lock.json
