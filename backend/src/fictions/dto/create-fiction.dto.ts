@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
   IsOptional,
@@ -8,14 +9,17 @@ import {
 } from 'class-validator';
 
 export class CreateFictionDto {
+  @Transform(({ value }: { value: string }) => value?.trim())
   @IsString()
   @IsNotEmpty()
   title!: string;
 
+  @Transform(({ value }: { value: string }) => value?.trim())
   @IsString()
   @IsOptional()
   description?: string;
 
+  @Transform(({ value }: { value: string }) => value?.trim())
   @IsString()
   @IsOptional()
   genre?: string;
