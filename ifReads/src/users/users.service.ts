@@ -79,4 +79,55 @@ export class UsersService {
       },
     });
   }
+
+  async getFavorites(userId: number) {
+    return await this.prisma.favorite.findMany({
+      where: { userId },
+      include: {
+        fiction: {
+          include: {
+            author: { select: { id: true, name: true } },
+            authors: { select: { id: true, name: true, role: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async addFavorite(userId: number, fictionId: number) {
+    const fiction = await this.prisma.fiction.findUnique({
+      where: { id: fictionId },
+    });
+    if (!fiction) throw new NotFoundException('Ficção não encontrada');
+
+    return this.prisma.favorite.upsert({
+      where: { userId_fictionId: { userId, fictionId } },
+      create: { userId, fictionId },
+      update: {},
+    });
+  }
+
+  async removeFavorite(userId: number, fictionId: number) {
+    const existing = await this.prisma.favorite.findUnique({
+      where: { userId_fictionId: { userId, fictionId } },
+    });
+    if (!existing) throw new NotFoundException('Favorito não encontrado');
+
+    await this.prisma.favorite.delete({
+      where: { userId_fictionId: { userId, fictionId } },
+    });
+
+    return { message: 'Removido dos favoritos' };
+  }
+
+  async getMyReviews(userId: number) {
+    return this.prisma.review.findMany({
+      where: { authorId: userId },
+      include: {
+        fiction: { select: { id: true, title: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }

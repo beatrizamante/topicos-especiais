@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ export function AuthModal({
   onClose,
   onSwitchMode,
 }: AuthModalProps) {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,6 +51,7 @@ export function AuthModal({
         await authApi.register({ name: username, email, password });
       } else {
         await authApi.login({ email, password });
+        router.push('/profile');
       }
       onClose();
     } catch (err: any) {

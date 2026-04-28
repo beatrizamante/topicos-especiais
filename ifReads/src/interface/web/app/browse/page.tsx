@@ -148,15 +148,19 @@ export default function BrowsePage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              className="text-foreground hover:text-primary hover:bg-primary/10"
-            >
-              Login
-            </Button>
-            <Button className="bg-primary/90 text-primary-foreground hover:bg-primary">
-              Sign Up
-            </Button>
+            <Link href="/profile">
+              <Button
+                variant="ghost"
+                className="text-foreground hover:text-primary hover:bg-primary/10"
+              >
+                Profile
+              </Button>
+            </Link>
+            <Link href="/profile?tab=settings">
+              <Button className="bg-primary/90 text-primary-foreground hover:bg-primary">
+                My Account
+              </Button>
+            </Link>
           </div>
         </div>
       </header>

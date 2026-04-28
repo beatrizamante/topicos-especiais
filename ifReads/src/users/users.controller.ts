@@ -3,9 +3,12 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
+  Param,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto.js';
@@ -38,5 +41,37 @@ export class UsersController {
     @Body() dto: UpdateUserDto,
   ) {
     return this.usersService.updateMe(user.sub, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/favorites')
+  getFavorites(@CurrentUser() user: jwtPayloadInterface.JwtPayload) {
+    return this.usersService.getFavorites(user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('me/favorites/:fictionId')
+  @HttpCode(HttpStatus.CREATED)
+  addFavorite(
+    @CurrentUser() user: jwtPayloadInterface.JwtPayload,
+    @Param('fictionId', ParseIntPipe) fictionId: number,
+  ) {
+    return this.usersService.addFavorite(user.sub, fictionId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('me/favorites/:fictionId')
+  @HttpCode(HttpStatus.OK)
+  removeFavorite(
+    @CurrentUser() user: jwtPayloadInterface.JwtPayload,
+    @Param('fictionId', ParseIntPipe) fictionId: number,
+  ) {
+    return this.usersService.removeFavorite(user.sub, fictionId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/reviews')
+  getMyReviews(@CurrentUser() user: jwtPayloadInterface.JwtPayload) {
+    return this.usersService.getMyReviews(user.sub);
   }
 }
