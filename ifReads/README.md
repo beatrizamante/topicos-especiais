@@ -1,61 +1,118 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# ifReads — API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend da aplicação **ifReads**, uma plataforma de resenhas de ficções interativas.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Stack: NestJS + Fastify · Prisma 7 (driver adapter `@prisma/adapter-pg`) · PostgreSQL (Neon) · JWT via HTTP-only cookie.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Pré-requisitos
 
-## Project setup
+- Node.js 20+
+- npm 10+
+- Uma instância PostgreSQL acessível (recomendado: [Neon](https://neon.tech))
+
+---
+
+## Setup
+
+### 1. Instalar dependências
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+### 2. Configurar variáveis de ambiente
+
+Crie um arquivo `.env` na raiz de `ifReads/` com base no `.env.example`:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+Preencha os valores:
+
+```env
+DATABASE_URL=postgresql://<user>:<password>@<host>/<db>?sslmode=require
+JWT_SECRET=sua_chave_secreta_aqui
+FRONTEND_URL=http://localhost:3001
+PORT=3000
+```
+
+### 3. Gerar o Prisma Client
+
+> **Obrigatório após clonar o repositório.** O cliente gerado não é versionado no Git.
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npx prisma generate
 ```
+
+### 4. Executar as migrations
+
+```bash
+npx prisma migrate deploy
+```
+
+### 5. (Opcional) Popular o banco com dados iniciais
+
+```bash
+npx prisma db seed
+```
+
+---
+
+## Rodando o projeto
+
+```bash
+# desenvolvimento (watch mode)
+npm run start:dev
+
+# produção
+npm run start:prod
+```
+
+A API estará disponível em `http://localhost:3000`.
+Swagger UI: `http://localhost:3000/api`.
+
+---
+
+## Frontend
+
+O frontend (Next.js) está em `src/interface/web/`. Para rodá-lo:
+
+```bash
+cd src/interface/web
+pnpm install
+# crie src/interface/web/.env.local com:
+# NEXT_PUBLIC_BASE_URL=http://localhost:3000
+pnpm dev
+```
+
+Disponível em `http://localhost:3001`.
+
+---
+
+## Testes
+
+```bash
+# unitários
+npm run test
+
+# integração (banco real)
+npm run test:integration
+
+# e2e
+npm run test:e2e
+
+# cobertura
+npm run test:cov
+```
+
+---
+
+## Por que `src/generated/prisma/` não está no Git?
+
+O Prisma Client é gerado localmente a partir do `prisma/schema.prisma`. Arquivos gerados não devem ser versionados — execute `npx prisma generate` sempre que clonar o repositório ou alterar o schema.
 
 ## Deployment
 
