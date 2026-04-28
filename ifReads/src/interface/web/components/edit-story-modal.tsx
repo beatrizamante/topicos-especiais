@@ -273,7 +273,7 @@ export function EditStoryModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Write a compelling description..."
-                className="bg-input border-border focus:border-primary focus:ring-primary min-h-[120px] resize-none"
+                className="bg-input border-border focus:border-primary focus:ring-primary min-h-30 resize-none"
               />
             </div>
 

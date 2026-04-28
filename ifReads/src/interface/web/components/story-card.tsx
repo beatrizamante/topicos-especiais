@@ -64,13 +64,15 @@ export function StoryCard({
   };
   if (viewMode === 'list') {
     return (
-      <Link
-        href={`/story/${story.id}`}
-        className="group flex gap-6 p-5 rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5"
-      >
+      <div className="group relative flex gap-6 p-5 rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+        <Link
+          href={`/story/${story.id}`}
+          className="absolute inset-0 z-0"
+          aria-label={story.title}
+        />
         {/* Cover */}
-        <div className="w-32 h-40 flex-shrink-0 rounded-xl bg-secondary/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+        <div className="w-32 h-40 shrink-0 rounded-xl bg-secondary/50 relative overflow-hidden">
+          <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-accent/20" />
           <div className="absolute inset-0 flex items-center justify-center">
             <BookOpen className="w-10 h-10 text-primary/40" />
           </div>
@@ -99,7 +101,7 @@ export function StoryCard({
               </h3>
               <Link
                 href={`/author/${story.author.id}`}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                className="relative z-1 text-sm text-muted-foreground hover:text-primary transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
                 by {story.author.name}
@@ -108,7 +110,7 @@ export function StoryCard({
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-primary hover:bg-primary/10 flex-shrink-0"
+              className="relative z-1 text-muted-foreground hover:text-primary hover:bg-primary/10 shrink-0"
               onClick={(e) => void handleFavorite(e)}
               disabled={favLoading}
             >
@@ -151,18 +153,20 @@ export function StoryCard({
             </div>
           )}
         </div>
-      </Link>
+      </div>
     );
   }
 
   return (
-    <Link
-      href={`/story/${story.id}`}
-      className="group relative rounded-2xl overflow-hidden bg-card border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5"
-    >
+    <div className="group relative rounded-2xl overflow-hidden bg-card border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+      <Link
+        href={`/story/${story.id}`}
+        className="absolute inset-0 z-0"
+        aria-label={story.title}
+      />
       {/* Cover Image */}
-      <div className="aspect-[4/3] bg-secondary/50 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+      <div className="aspect-4/3 bg-secondary/50 relative overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-accent/20" />
         <div className="absolute inset-0 flex items-center justify-center">
           <BookOpen className="w-12 h-12 text-primary/40" />
         </div>
@@ -171,7 +175,7 @@ export function StoryCard({
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-3 right-3 bg-background/50 backdrop-blur-sm text-muted-foreground hover:text-primary hover:bg-background/80"
+          className="absolute top-3 right-3 z-1 bg-background/50 backdrop-blur-sm text-muted-foreground hover:text-primary hover:bg-background/80"
           onClick={(e) => void handleFavorite(e)}
           disabled={favLoading}
         >
@@ -204,7 +208,7 @@ export function StoryCard({
 
         <Link
           href={`/author/${story.author.id}`}
-          className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          className="relative z-1 text-sm text-muted-foreground hover:text-primary transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
           by {story.author.name}
@@ -231,6 +235,6 @@ export function StoryCard({
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 }

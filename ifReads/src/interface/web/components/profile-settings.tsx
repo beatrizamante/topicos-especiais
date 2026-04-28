@@ -48,8 +48,6 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profileSuccess, setProfileSuccess] = useState(false);
-
-  // Password form
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -58,7 +56,6 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
 
-  // Notifications (UI only — no backend yet)
   const [notifications, setNotifications] = useState({
     newReviews: true,
     newFollowers: true,

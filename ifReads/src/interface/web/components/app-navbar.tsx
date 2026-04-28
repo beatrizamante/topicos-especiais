@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { BookOpen, Sparkles, User, LogOut } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { BookOpen, Sparkles, User, LogOut, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,14 +15,23 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { AuthModal } from '@/components/auth-modal';
 import { authApi } from '@/app/api/middleware/auth';
+import { CreateStoryModal } from '@/components/create-story-model';
 
 export function AppNavbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [authModal, setAuthModal] = useState<'signin' | 'login' | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [authedUser, setAuthedUser] = useState<{
     id: number;
     email: string;
   } | null>(null);
+
+  const navLinks = [
+    { href: '/browse', label: 'Browse' },
+    { href: '/top-rated', label: 'Top Rated' },
+    { href: '/new-releases', label: 'New Releases' },
+  ];
 
   const checkAuth = () => {
     authApi
@@ -45,6 +54,11 @@ export function AppNavbar() {
 
   return (
     <>
+      <CreateStoryModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => router.refresh()}
+      />
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="flex items-center justify-between px-6 py-4 md:px-12 lg:px-20">
           <Link href="/" className="flex items-center gap-2 group">
@@ -57,42 +71,67 @@ export function AppNavbar() {
             </span>
           </Link>
 
+          <nav className="hidden md:flex items-center gap-6">
+            {navLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`text-sm transition-colors ${
+                  pathname === href
+                    ? 'text-primary font-medium'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+
           <div className="flex items-center gap-3">
             {authedUser ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full border border-primary/30 hover:border-primary/60"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                        {authedUser.email[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-44">
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href="/profile"
-                      className="flex items-center gap-2 cursor-pointer"
+              <>
+                <Button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="bg-primary/90 text-primary-foreground hover:bg-primary gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Story
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full border border-primary/30 hover:border-primary/60"
                     >
-                      <User className="w-4 h-4" />
-                      My Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => void handleLogout()}
-                    className="flex items-center gap-2 text-destructive focus:text-destructive cursor-pointer"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                          {authedUser.email[0].toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44">
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/profile"
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <User className="w-4 h-4" />
+                        My Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={() => void handleLogout()}
+                      className="flex items-center gap-2 text-destructive focus:text-destructive cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
               <>
                 <Button

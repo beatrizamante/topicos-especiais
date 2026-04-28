@@ -12,7 +12,6 @@ import {
   Calendar,
 } from 'lucide-react';
 import { ReviewSection } from '@/components/review-section';
-import { AppNavbar } from '@/components/app-navbar';
 import { FavoriteButton } from '@/components/favorite-button';
 import { fictionsApi } from '@/app/api/fictions';
 
@@ -67,7 +66,6 @@ export default async function StoryDetailPage({ params }: PageProps) {
       </div>
 
       {/* Header */}
-      <AppNavbar />
 
       <main className="relative z-10 px-6 md:px-12 lg:px-20 py-8">
         {/* Back Link */}

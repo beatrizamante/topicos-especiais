@@ -134,36 +134,6 @@ export default function ProfilePage() {
         onDeleted={handleDeleteStory}
       />
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-primary" />
-              <span className="font-serif text-xl font-semibold">ifReads</span>
-            </Link>
-            <nav className="flex items-center gap-4">
-              <Button
-                onClick={() => setIsCreateModalOpen(true)}
-                size="sm"
-                className="bg-primary/90 text-primary-foreground hover:bg-primary gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Add Story
-              </Button>
-              <Link href="/browse">
-                <Button variant="ghost" size="sm">
-                  Browse
-                </Button>
-              </Link>
-              <Avatar className="h-8 w-8 border border-primary/30">
-                <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-            </nav>
-          </div>
-        </header>
-
         <main className="container mx-auto px-4 py-8">
           {/* Profile Header */}
           <div className="flex flex-col md:flex-row gap-6 mb-8">

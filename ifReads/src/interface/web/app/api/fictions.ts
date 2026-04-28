@@ -23,6 +23,7 @@ const FictionSchema = z.object({
     .optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  averageRating: z.number().nullable().optional(),
 });
 
 const CreateFictionInput = z.object({

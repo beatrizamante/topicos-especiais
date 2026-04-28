@@ -155,7 +155,6 @@ export function CreateStoryModal({
         genre:
           selectedGenres.length > 0 ? selectedGenres.join(', ') : undefined,
       });
-      // Add extra authors (skip first entry which is "You" / main_author)
       const extraAuthors = authors.slice(1);
       for (const author of extraAuthors) {
         const role =

@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  BookOpen,
-  Sparkles,
   Search,
   Star,
   Filter,
@@ -14,10 +12,6 @@ import {
   Grid3X3,
   List,
   ChevronDown,
-  Clock,
-  TrendingUp,
-  Heart,
-  Plus,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -27,38 +21,19 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { StoryCard } from '@/components/story-card';
 import { fictionsApi, type Fiction } from '@/app/api/fictions';
-import { CreateStoryModal } from '../../components/create-story-model';
-
-const genres = [
-  'All Genres',
-  'Mystery',
-  'Sci-Fi',
-  'Fantasy',
-  'Horror',
-  'Romance',
-  'Adventure',
-  'Historical',
-  'Thriller',
-  'Comedy',
-];
-
-const sortOptions = [
-  { value: 'popular', label: 'Most Popular', icon: TrendingUp },
-  { value: 'rating', label: 'Highest Rated', icon: Star },
-  { value: 'recent', label: 'Most Recent', icon: Clock },
-  { value: 'favorites', label: 'Most Favorited', icon: Heart },
-];
+import { sortOptions, type SortOption } from '../types/Filters';
+import { genres, type Genre } from '../types/Fiction';
+import { useFilteredStories } from '@/hooks/filter-stories';
 
 export default function BrowsePage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState('All Genres');
-  const [sortBy, setSortBy] = useState('popular');
+  const [selectedGenre, setSelectedGenre] = useState<Genre>('All Genres');
+  const [sortBy, setSortBy] = useState<SortOption>('popular');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [fictions, setFictions] = useState<Fiction[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -85,305 +60,216 @@ export default function BrowsePage() {
       .catch(console.error);
   };
 
-  const filteredFictions = useMemo(() => {
-    let result = [...fictions];
-    if (selectedGenre !== 'All Genres') {
-      result = result.filter((f) =>
-        f.genre
-          ?.split(',')
-          .map((g) => g.trim())
-          .includes(selectedGenre),
-      );
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (f) =>
-          f.title.toLowerCase().includes(q) ||
-          f.description?.toLowerCase().includes(q) ||
-          f.author.name.toLowerCase().includes(q),
-      );
-    }
-    if (sortBy === 'recent') {
-      result.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-    }
-    return result;
-  }, [fictions, selectedGenre, searchQuery, sortBy]);
+  const filteredFictions = useFilteredStories({
+    fictions,
+    genre: selectedGenre,
+    searchQuery,
+    sortBy,
+  });
 
   const currentSort =
     sortOptions.find((s) => s.value === sortBy) || sortOptions[0];
 
   return (
-    <>
-      <CreateStoryModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={() => {
-          setLoading(true);
-          fictionsApi
-            .findAll(1, 50)
-            .then((res) => {
-              setFictions(res.data);
-              setPage(1);
-              setHasMore(res.total > res.data.length);
-            })
-            .catch(console.error)
-            .finally(() => setLoading(false));
-        }}
-      />
-      <div className="min-h-screen bg-background">
-        {/* Background effects */}
-        <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-150 h-75 bg-primary/5 blur-[120px] rounded-full" />
-          <div className="absolute bottom-1/4 right-0 w-100 h-100 bg-accent/5 blur-[100px] rounded-full" />
+    <div className="min-h-screen bg-background">
+      {/* Background effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-150 h-75 bg-primary/5 blur-[120px] rounded-full" />
+        <div className="absolute bottom-1/4 right-0 w-100 h-100 bg-accent/5 blur-[100px] rounded-full" />
+      </div>
+
+      {/* Main Content */}
+      <main className="relative z-10 px-6 md:px-12 lg:px-20 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-2">
+            Browse Interactive Fiction
+          </h1>
+          <p className="text-muted-foreground">
+            Discover stories where your choices matter
+          </p>
         </div>
 
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-          <div className="flex items-center justify-between px-6 py-4 md:px-12 lg:px-20">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="relative">
-                <BookOpen className="w-7 h-7 text-primary transition-transform group-hover:scale-110" />
-                <Sparkles className="w-2.5 h-2.5 text-teal-glow absolute -top-0.5 -right-0.5" />
-              </div>
-              <span className="text-xl font-serif font-semibold text-foreground">
-                ifReads
-              </span>
-            </Link>
+        {/* Search and Filters */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-8">
+          {/* Search */}
+          <div className="relative flex-1 max-w-xl">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search stories, authors, or tags..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-secondary/50 border-border/50 focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
 
-            <div className="hidden md:flex items-center gap-6">
-              <Link href="/browse" className="text-foreground font-medium">
-                Browse
-              </Link>
-              <Link
-                href="/browse?sort=rating"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Top Rated
-              </Link>
-              <Link
-                href="/browse?filter=new"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                New Releases
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="bg-primary/90 text-primary-foreground hover:bg-primary gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Add Story
-              </Button>
-              <Link href="/profile">
-                <Button className="bg-primary/90 text-primary-foreground hover:bg-primary">
-                  Profile
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Genre Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="bg-secondary/30 border-border/50 hover:bg-secondary/50 text-foreground gap-2"
+                >
+                  <Filter className="w-4 h-4" />
+                  {selectedGenre}
+                  <ChevronDown className="w-4 h-4" />
                 </Button>
-              </Link>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="relative z-10 px-6 md:px-12 lg:px-20 py-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-2">
-              Browse Interactive Fiction
-            </h1>
-            <p className="text-muted-foreground">
-              Discover stories where your choices matter
-            </p>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-8">
-            {/* Search */}
-            <div className="relative flex-1 max-w-xl">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search stories, authors, or tags..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-secondary/50 border-border/50 focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Genre Filter */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="bg-secondary/30 border-border/50 hover:bg-secondary/50 text-foreground gap-2"
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card border-border/50">
+                {genres.map((genre) => (
+                  <DropdownMenuItem
+                    key={genre}
+                    onClick={() => setSelectedGenre(genre)}
+                    className={
+                      selectedGenre === genre
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-foreground'
+                    }
                   >
-                    <Filter className="w-4 h-4" />
-                    {selectedGenre}
-                    <ChevronDown className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-card border-border/50">
-                  {genres.map((genre) => (
-                    <DropdownMenuItem
-                      key={genre}
-                      onClick={() => setSelectedGenre(genre)}
-                      className={
-                        selectedGenre === genre
-                          ? 'bg-primary/10 text-primary'
-                          : 'text-foreground'
-                      }
-                    >
-                      {genre}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    {genre}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-              {/* Sort */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="bg-secondary/30 border-border/50 hover:bg-secondary/50 text-foreground gap-2"
+            {/* Sort */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="bg-secondary/30 border-border/50 hover:bg-secondary/50 text-foreground gap-2"
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  {currentSort.label}
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card border-border/50">
+                {sortOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => setSortBy(option.value)}
+                    className={
+                      sortBy === option.value
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-foreground'
+                    }
                   >
-                    <SlidersHorizontal className="w-4 h-4" />
-                    {currentSort.label}
-                    <ChevronDown className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-card border-border/50">
-                  {sortOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onClick={() => setSortBy(option.value)}
-                      className={
-                        sortBy === option.value
-                          ? 'bg-primary/10 text-primary'
-                          : 'text-foreground'
-                      }
-                    >
-                      <option.icon className="w-4 h-4 mr-2" />
-                      {option.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <option.icon className="w-4 h-4 mr-2" />
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-              {/* View Toggle */}
-              <div className="flex items-center rounded-lg border border-border/50 bg-secondary/30 p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'grid'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Genre Pills */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {genres.slice(1).map((genre) => (
+            {/* View Toggle */}
+            <div className="flex items-center rounded-lg border border-border/50 bg-secondary/30 p-1">
               <button
-                key={genre}
-                onClick={() =>
-                  setSelectedGenre(
-                    genre === selectedGenre ? 'All Genres' : genre,
-                  )
-                }
-                className={`px-4 py-2 rounded-full text-sm transition-all ${
-                  genre === selectedGenre
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-md transition-colors ${
+                  viewMode === 'grid'
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground border border-border/50'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {genre}
+                <Grid3X3 className="w-4 h-4" />
               </button>
-            ))}
-          </div>
-
-          {/* Results Count */}
-          <div className="mb-6 text-sm text-muted-foreground">
-            Showing{' '}
-            <span className="text-foreground font-medium">
-              {filteredFictions.length}
-            </span>{' '}
-            stories
-            {selectedGenre !== 'All Genres' && (
-              <>
-                {' '}
-                in <span className="text-primary">{selectedGenre}</span>
-              </>
-            )}
-          </div>
-
-          {/* Stories Grid/List */}
-          <div
-            className={
-              viewMode === 'grid'
-                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-                : 'flex flex-col gap-4'
-            }
-          >
-            {loading ? (
-              <div className="col-span-full text-center py-12 text-muted-foreground">
-                Loading...
-              </div>
-            ) : filteredFictions.length === 0 ? (
-              <div className="col-span-full text-center py-12 text-muted-foreground">
-                No fiction found.
-              </div>
-            ) : (
-              filteredFictions.map((f) => (
-                <StoryCard
-                  key={f.id}
-                  viewMode={viewMode}
-                  story={{
-                    id: f.id.toString(),
-                    title: f.title,
-                    author: { id: f.author.id.toString(), name: f.author.name },
-                    genre: f.genre ?? '',
-                    description: f.description ?? '',
-                  }}
-                />
-              ))
-            )}
-          </div>
-
-          {hasMore && (
-            <div className="flex justify-center mt-12">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={loadMore}
-                className="bg-secondary/30 border-border/50 hover:bg-secondary/50 text-foreground"
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-md transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
               >
-                Load More Stories
-              </Button>
+                <List className="w-4 h-4" />
+              </button>
             </div>
+          </div>
+        </div>
+
+        {/* Genre Pills */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {genres.slice(1).map((genre) => (
+            <button
+              key={genre}
+              onClick={() =>
+                setSelectedGenre(genre === selectedGenre ? 'All Genres' : genre)
+              }
+              className={`px-4 py-2 rounded-full text-sm transition-all ${
+                genre === selectedGenre
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground border border-border/50'
+              }`}
+            >
+              {genre}
+            </button>
+          ))}
+        </div>
+
+        {/* Results Count */}
+        <div className="mb-6 text-sm text-muted-foreground">
+          Showing{' '}
+          <span className="text-foreground font-medium">
+            {filteredFictions.length}
+          </span>{' '}
+          stories
+          {selectedGenre !== 'All Genres' && (
+            <>
+              {' '}
+              in <span className="text-primary">{selectedGenre}</span>
+            </>
           )}
-        </main>
-      </div>
-    </>
+        </div>
+
+        {/* Stories Grid/List */}
+        <div
+          className={
+            viewMode === 'grid'
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+              : 'flex flex-col gap-4'
+          }
+        >
+          {loading ? (
+            <div className="col-span-full text-center py-12 text-muted-foreground">
+              Loading...
+            </div>
+          ) : filteredFictions.length === 0 ? (
+            <div className="col-span-full text-center py-12 text-muted-foreground">
+              No fiction found.
+            </div>
+          ) : (
+            filteredFictions.map((f) => (
+              <StoryCard
+                key={f.id}
+                viewMode={viewMode}
+                story={{
+                  id: f.id.toString(),
+                  title: f.title,
+                  author: { id: f.author.id.toString(), name: f.author.name },
+                  genre: f.genre ?? '',
+                  description: f.description ?? '',
+                }}
+              />
+            ))
+          )}
+        </div>
+
+        {hasMore && (
+          <div className="flex justify-center mt-12">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={loadMore}
+              className="bg-secondary/30 border-border/50 hover:bg-secondary/50 text-foreground"
+            >
+              Load More Stories
+            </Button>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

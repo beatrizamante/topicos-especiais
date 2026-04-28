@@ -38,7 +38,20 @@ export class FictionsService {
       this.prisma.fiction.count(),
     ]);
 
-    return { data, total, page, limit };
+    const avgRatings = await this.prisma.review.groupBy({
+      by: ['fictionId'],
+      where: { fictionId: { in: data.map((f) => f.id) } },
+      _avg: { rating: true },
+    });
+
+    const avgMap = new Map(avgRatings.map((r) => [r.fictionId, r._avg.rating]));
+
+    const enriched = data.map((f) => ({
+      ...f,
+      averageRating: avgMap.get(f.id) ?? null,
+    }));
+
+    return { data: enriched, total, page, limit };
   }
 
   async findOne(id: number) {
@@ -61,11 +74,16 @@ export class FictionsService {
       throw new NotFoundException('Ficção não encontrada');
     }
 
-    return fiction;
+    const avgResult = await this.prisma.review.aggregate({
+      where: { fictionId: id },
+      _avg: { rating: true },
+    });
+
+    return { ...fiction, averageRating: avgResult._avg.rating };
   }
 
   async findMine(userId: number) {
-    return this.prisma.fiction.findMany({
+    const data = await this.prisma.fiction.findMany({
       where: { authorId: userId },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -73,6 +91,16 @@ export class FictionsService {
         authors: true,
       },
     });
+
+    const avgRatings = await this.prisma.review.groupBy({
+      by: ['fictionId'],
+      where: { fictionId: { in: data.map((f) => f.id) } },
+      _avg: { rating: true },
+    });
+
+    const avgMap = new Map(avgRatings.map((r) => [r.fictionId, r._avg.rating]));
+
+    return data.map((f) => ({ ...f, averageRating: avgMap.get(f.id) ?? null }));
   }
 
   async update(id: number, dto: UpdateFictionDto, userId: number) {
